@@ -19,9 +19,7 @@ export default function LeftSidebar() {
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Explore', href: '/explore', icon: Search },
-    { name: 'Notifications', href: '/notifications', icon: Bell },
     { name: 'Bookmarks', href: '/bookmarks', icon: Bookmark },
-    { name: 'Lists', href: '/lists', icon: ListOrdered },
     { name: 'Profile', href: '/profile', icon: User },
     { name: 'Logout', href: '/login', icon: LogOut },
   ];

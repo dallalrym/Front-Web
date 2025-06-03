@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Heart, MessageCircle, Repeat, Share, Bookmark, MoreHorizontal } from 'lucide-react';
+import { MessageCircle, Repeat, Share, Bookmark, MoreHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Post } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -17,12 +17,11 @@ import {
 
 interface PostItemProps {
   post: Post;
-  onLike: () => void;
   onRepost: () => void;
   onBookmark: () => void;
 }
 
-export default function PostItem({ post, onLike, onRepost, onBookmark }: PostItemProps) {
+export default function PostItem({ post, onRepost, onBookmark }: PostItemProps) {
   const [showComments, setShowComments] = useState(false);
 
   const timeAgo = formatDistanceToNow(new Date(post.timestamp), { 
@@ -129,7 +128,6 @@ export default function PostItem({ post, onLike, onRepost, onBookmark }: PostIte
             </button>
 
             <button 
-              onClick={onLike}
               className={cn(
                 "flex items-center group",
                 post.isLiked ? "text-pink-500" : "text-gray-500 hover:text-pink-500"
@@ -139,9 +137,7 @@ export default function PostItem({ post, onLike, onRepost, onBookmark }: PostIte
                 "p-2 rounded-full", 
                 post.isLiked ? "bg-pink-500/10" : "group-hover:bg-pink-500/10"
               )}>
-                <Heart className={cn("w-5 h-5", post.isLiked && "fill-pink-500")} />
               </div>
-              <span className="text-sm ml-1">{post.stats.likes}</span>
             </button>
 
             <button 

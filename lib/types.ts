@@ -19,7 +19,6 @@ export interface User {
 export interface PostStats {
   comments: number;
   reposts: number;
-  likes: number;
   views: number;
 }
 

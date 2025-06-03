@@ -17,23 +17,6 @@ export default function UserProfile({ user }: UserProfileProps) {
   const [posts, setPosts] = useState<Post[]>(getUserPosts(user.username));
   const [activeTab, setActiveTab] = useState('posts');
 
-  const handleLike = (postId: string) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        const isLiked = !post.isLiked;
-        return {
-          ...post,
-          isLiked,
-          stats: {
-            ...post.stats,
-            likes: isLiked ? post.stats.likes + 1 : post.stats.likes - 1
-          }
-        };
-      }
-      return post;
-    }));
-  };
-
   const handleRepost = (postId: string) => {
     setPosts(posts.map(post => {
       if (post.id === postId) {
@@ -187,7 +170,6 @@ export default function UserProfile({ user }: UserProfileProps) {
             <PostItem 
               key={post.id} 
               post={post} 
-              onLike={() => handleLike(post.id)}
               onRepost={() => handleRepost(post.id)}
               onBookmark={() => handleBookmark(post.id)}
             />
