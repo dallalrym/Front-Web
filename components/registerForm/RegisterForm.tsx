@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import InputField from '../ui/input-field';
 import { Button } from '../ui/button';
+import { supabase } from '@/lib/supabaseClient'; // adapte le chemin si besoin
 
 interface FormData {
   username: string;
@@ -34,8 +35,7 @@ const RegisterForm = () => {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error when user types
+
     if (errors[name as keyof FormErrors]) {
       setErrors(prev => ({
         ...prev,
@@ -46,52 +46,42 @@ const RegisterForm = () => {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
-    
+
     if (!formData.username) {
-      newErrors.username = 'Le nom d\'utilisateur est requis';
+      newErrors.username = 'Le nom d\'utilisateur (email) est requis';
+    } else if (!/\S+@\S+\.\S+/.test(formData.username)) {
+      newErrors.username = 'Email invalide';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Le mot de passe est requis';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Le mot de passe doit contenir au moins 6 caractères';
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+
+    if (!validateForm()) return;
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-        }),
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.username,
+        password: formData.password,
       });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Une erreur est survenue');
-      }
-      
-      // Redirect to login page on success
-      router.push('/login');
+
+      if (error) throw new Error(error.message);
+
+      router.push('/login'); // redirection après inscription
     } catch (error) {
       if (error instanceof Error) {
         setErrors({ general: error.message });
@@ -102,6 +92,7 @@ const RegisterForm = () => {
       setIsSubmitting(false);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md">
@@ -118,8 +109,9 @@ const RegisterForm = () => {
       )}
 
       <InputField
-        label="Nom d'utilisateur"
+        label="Adresse email"
         name="username"
+        type="email"
         value={formData.username}
         onChange={handleChange}
         error={errors.username}
@@ -152,7 +144,7 @@ const RegisterForm = () => {
           disabled={isSubmitting}
           className="bg-[#F2B8B5] text-[#B47BA6] hover:bg-[#eea6a3] transition-all duration-300 transform hover:scale-105"
         >
-          {isSubmitting ? 'Création en cours...' : 'Créez votre compte'}
+          {isSubmitting ? 'Création en cours...' : 'Créer un compte'}
         </Button>
       </div>
     </form>
