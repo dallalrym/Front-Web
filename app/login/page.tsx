@@ -6,25 +6,23 @@ import InputField from "@/components/ui/input-field";
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMsg('');
     setLoading(true);
 
-    // Supabase ne gère pas directement "username" pour l'auth, mais email.
-    // Donc tu dois stocker dans ta base Supabase les utilisateurs avec un email.
-    // Si tu utilises "username", il faut gérer une table custom.
 
-    // Ici on part sur email (username sera un email) :
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: username, // attention ici c’est l’email !
+      email: username,
       password,
     });
 
@@ -33,9 +31,7 @@ export default function LoginPage() {
     if (error) {
       setErrorMsg(error.message);
     } else {
-      // Connexion OK, rediriger ou afficher un message
-      alert('Connexion réussie !');
-      // Par exemple : router.push('/dashboard');
+      router.push("..");
     }
   };
 
