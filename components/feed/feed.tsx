@@ -1,105 +1,53 @@
-"use client";
+'use client'
 
-import { useState } from 'react';
-import PostItem from '@/components/post/post-item';
-import ComposePostBox from '@/components/post/compose-post-box';
-import { mockPosts } from '@/lib/mock-data';
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabaseClient'
+import PostItemRessource from '../post/PostItemRessource'
+
+
+type Resource = {
+  id: number
+  title: string
+  description: string
+  content: string
+  created_at?: string
+}
 
 export default function Feed() {
-  const [posts, setPosts] = useState(mockPosts);
+  const [resources, setResources] = useState<Resource[]>([])
 
-  const addPost = (content: string, media?: string) => {
-    const newPost = {
-      id: String(Date.now()),
-      author: {
-        id: 'current-user',
-        name: 'Baburrrrr',
-        username: 'babur',
-        avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
-        isVerified: false
-      },
-      content,
-      media: media ? [media] : [],
-      timestamp: new Date().toISOString(),
-      stats: {
-        comments: 0,
-        reposts: 0,
-        likes: 0,
-        views: 0
-      },
-      isLiked: false,
-      isReposted: false,
-      isBookmarked: false
-    };
+useEffect(() => {
+  async function fetchResources() {
+    const { data, error } = await supabase.from('resource').select('*')
 
-    setPosts([newPost, ...posts]);
-  };
+    console.log('DATA 🔽', data)
+    console.log('ERROR 🔽', error)
 
-  const handleLike = (postId: string) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        const isLiked = !post.isLiked;
-        return {
-          ...post,
-          isLiked,
-          stats: {
-            ...post.stats,
-            likes: isLiked ? post.stats.likes + 1 : post.stats.likes - 1
-          }
-        };
-      }
-      return post;
-    }));
-  };
+    if (error) {
+      console.error('Erreur Supabase :', error)
+    } else {
+      setResources(data || [])
+    }
+  }
 
-  const handleRepost = (postId: string) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        const isReposted = !post.isReposted;
-        return {
-          ...post,
-          isReposted,
-          stats: {
-            ...post.stats,
-            reposts: isReposted ? post.stats.reposts + 1 : post.stats.reposts - 1
-          }
-        };
-      }
-      return post;
-    }));
-  };
-
-  const handleBookmark = (postId: string) => {
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        return {
-          ...post,
-          isBookmarked: !post.isBookmarked
-        };
-      }
-      return post;
-    }));
-  };
+  fetchResources()
+}, [])
 
   return (
-    <div className="min-h-screen border-x border-gray-200 dark:border-gray-800">
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-black/80 backdrop-blur-md p-4 border-b border-gray-200 dark:border-gray-800">
-        <h1 className="text-xl font-bold">Home</h1>
-      </div>
-
-      <ComposePostBox onSubmit={addPost} />
-
-      <div className="divide-y divide-gray-200 dark:divide-gray-800">
-        {posts.map(post => (
-          <PostItem 
-            key={post.id} 
-            post={post} 
-            onLike={() => handleLike(post.id)}
-            onRepost={() => handleRepost(post.id)}
-            onBookmark={() => handleBookmark(post.id)}
+    <div className="flex flex-col">
+      {resources.length === 0 ? (
+        <p className="text-center text-muted-foreground mt-4">Aucune ressource trouvée.</p>
+      ) : (
+        resources.map((res) => (
+          <PostItemRessource
+            key={res.id}
+            title={res.title}
+            description={res.description}
+            content={res.content}
+            created_at={res.created_at}
           />
-        ))}
-      </div>
+        ))
+      )}
     </div>
-  );
+  )
 }
