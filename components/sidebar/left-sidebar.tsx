@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 export default function LeftSidebar() {
   const pathname = usePathname();
   const [showComposeDialog, setShowComposeDialog] = useState(false);
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   const { signOut } = useAuth();
   const router = useRouter();
 
