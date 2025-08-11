@@ -11,18 +11,24 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import ComposePostDialog from '@/components/post/compose-post-dialog';
 import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LeftSidebar() {
   const pathname = usePathname();
   const [showComposeDialog, setShowComposeDialog] = useState(false);
+  const { user, loading, signOut } = useAuth();
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Explore', href: '/explore', icon: Search },
     { name: 'Bookmarks', href: '/bookmarks', icon: Bookmark },
     { name: 'Profile', href: '/profile', icon: User },
-    { name: 'Logout', href: '/login', icon: LogOut },
   ];
+
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = '/login';
+  };
 
   return (
     <div className="w-20 xl:w-64 h-screen sticky top-0 flex flex-col p-4">
@@ -64,7 +70,7 @@ export default function LeftSidebar() {
 
       <Button
         onClick={() => setShowComposeDialog(true)}
-        className="bg-primary rounded-full py-3 text-white font-bold w-full mt-auto"
+        className="bg-primary rounded-full py-3 text-white font-bold w-full"
       >
         <span className="hidden xl:block">Publication</span>
         <PenSquare className="w-6 h-6 xl:hidden" />
@@ -75,18 +81,64 @@ export default function LeftSidebar() {
         onOpenChange={setShowComposeDialog}
       />
 
-      <div className="mt-auto mb-4 flex items-center p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer">
-        <div className="w-10 h-10 rounded-full bg-gray-300 mr-3">
-          <img
-            src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
-            alt="Profile"
-            className="w-10 h-10 rounded-full object-cover"
-          />
-        </div>
-        <div className="hidden xl:block">
-          <p className="font-bold text-sm">Babur</p>
-          <p className="text-gray-500 text-sm">@babur</p>
-        </div>
+      {/* Section utilisateur en bas */}
+      <div className="mt-auto mb-4">
+        {/* État de chargement */}
+        {loading && (
+          <div className="p-3">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse"></div>
+              <div className="hidden xl:block space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-24"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Utilisateur connecté */}
+        {!loading && user && (
+          <div>
+            <div className="flex items-center p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer mb-2">
+              <div className="w-10 h-10 rounded-full bg-gray-300 mr-3 flex items-center justify-center">
+                {user.user_metadata?.full_name ? (
+                  <span className="text-sm font-bold text-gray-700">
+                    {user.user_metadata.full_name.charAt(0).toUpperCase()}
+                  </span>
+                ) : (
+                  <span className="text-sm font-bold text-gray-700">
+                    {user.email?.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="hidden xl:block">
+                <p className="font-bold text-sm">
+                  {user.user_metadata?.full_name || 'Utilisateur'}
+                </p>
+                <p className="text-gray-500 text-sm">{user.email}</p>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full rounded-full py-2 text-sm hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+            >
+              <LogOut className="w-4 h-4 mr-2 xl:mr-2" />
+              <span className="hidden xl:block">Déconnexion</span>
+            </Button>
+          </div>
+        )}
+
+        {/* Utilisateur non connecté */}
+        {!loading && !user && (
+          <div className="p-3 text-center">
+            <p className="text-gray-500 text-sm mb-2">Non connecté</p>
+            <Link href="/login">
+              <Button variant="outline" size="sm" className="w-full">Se connecter</Button>
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

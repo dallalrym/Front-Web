@@ -1,23 +1,52 @@
 "use client";
 
-import { useState } from 'react';
-import { ArrowLeft, Calendar, Link as LinkIcon, MapPin, Mail } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowLeft, Calendar, Link as LinkIcon, MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import PostItem from '@/components/post/post-item';
-import { User, Post } from '@/lib/types';
-import { getUserPosts } from '@/lib/mock-data';
 import Link from 'next/link';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Profile } from '@/lib/types';
+import { useProfile } from '@/hooks/useProfile';
 
 interface UserProfileProps {
-  user: User;
+  user: Profile;
+  userEmail?: string;
 }
 
-export default function UserProfile({ user }: UserProfileProps) {
-  const [posts, setPosts] = useState<Post[]>(getUserPosts(user.username));
+export default function UserProfile({ user, userEmail }: UserProfileProps) {
+  const [posts, setPosts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('posts');
+  const [postsLoading, setPostsLoading] = useState(true);
+  const { profile, loading, error } = useProfile(user.username);
 
-  const handleRepost = (postId: string) => {
+  useEffect(() => {
+    const supabase = createClientComponentClient();
+
+    async function fetchPosts() {
+      try {
+        setPostsLoading(true);
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('username', user.username)
+          .order('created_at', { ascending: false });
+
+        if (!error && data) {
+          setPosts(data);
+        }
+      } catch (err) {
+        console.error('Erreur lors de la récupération des posts:', err);
+      } finally {
+        setPostsLoading(false);
+      }
+    }
+
+    fetchPosts();
+  }, [user.username]);
+
+  const handleRepost = async (postId: string) => {
     setPosts(posts.map(post => {
       if (post.id === postId) {
         const isReposted = !post.isReposted;
@@ -32,9 +61,10 @@ export default function UserProfile({ user }: UserProfileProps) {
       }
       return post;
     }));
+    // TODO : Update dans Supabase si tu veux persister
   };
 
-  const handleBookmark = (postId: string) => {
+  const handleBookmark = async (postId: string) => {
     setPosts(posts.map(post => {
       if (post.id === postId) {
         return {
@@ -44,7 +74,42 @@ export default function UserProfile({ user }: UserProfileProps) {
       }
       return post;
     }));
+    // TODO : Update dans Supabase si tu veux persister
   };
+
+  // Affichage du chargement
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Chargement du profil...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Affichage de l'erreur
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-bold text-red-600 mb-2">Erreur</h2>
+          <p className="text-gray-600">{error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="mt-4"
+            variant="outline"
+          >
+            Réessayer
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Utiliser le profil récupéré par le hook ou le profil passé en props
+  const currentProfile = profile || user;
 
   return (
     <div className="min-h-screen">
@@ -54,19 +119,15 @@ export default function UserProfile({ user }: UserProfileProps) {
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h1 className="text-xl font-bold">{user.name}</h1>
-          <p className="text-gray-500 text-sm">{user.stats.posts} posts</p>
+          <h1 className="text-xl font-bold">{currentProfile.full_name}</h1>
+          <p className="text-gray-500 text-sm">{posts.length} posts</p>
         </div>
       </div>
 
       {/* Cover Photo */}
       <div className="h-48 bg-gray-300 relative">
-        {user.coverPhoto && (
-          <img 
-            src={user.coverPhoto} 
-            alt="Cover" 
-            className="w-full h-full object-cover"
-          />
+        {currentProfile.cover_photo && (
+          <img src={currentProfile.cover_photo} alt="Cover" className="w-full h-full object-cover" />
         )}
       </div>
 
@@ -74,9 +135,12 @@ export default function UserProfile({ user }: UserProfileProps) {
       <div className="px-4 pb-4 relative border-b border-gray-200 dark:border-gray-800">
         <div className="absolute -top-16 left-4 border-4 border-white dark:border-black rounded-full overflow-hidden">
           <img 
-            src={user.avatar} 
-            alt={user.name} 
+            src={currentProfile.avatar_url || '/default-avatar.png'}
+            alt={currentProfile.full_name} 
             className="w-32 h-32 object-cover"
+            onError={(e) => {
+              e.currentTarget.src = '/default-avatar.png';
+            }}
           />
         </div>
 
@@ -87,51 +151,50 @@ export default function UserProfile({ user }: UserProfileProps) {
         </div>
 
         <div className="mt-6">
-          <h1 className="text-xl font-bold">{user.name}</h1>
-          <p className="text-gray-500">@{user.username}</p>
+          <h1 className="text-xl font-bold">{currentProfile.full_name}</h1>
+          <p className="text-gray-500">@{currentProfile.username}</p>
+          {userEmail && (
+            <p className="text-gray-500 text-sm mt-1">{userEmail}</p>
+          )}
 
-          {user.isVerified && (
+          {currentProfile.is_verified && (
             <div className="flex items-center my-1">
-              <span className="text-primary">
-                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
-                  <g><path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"></path></g>
-                </svg>
-              </span>
+              {/* Icône verified */}
               <span className="ml-1 text-sm text-gray-500">Verified</span>
             </div>
           )}
 
-          <p className="my-2">{user.bio}</p>
+          <p className="my-2">{currentProfile.bio}</p>
 
           <div className="flex flex-wrap text-sm text-gray-500 gap-y-1">
-            {user.location && (
+            {currentProfile.location && (
               <div className="flex items-center mr-4">
                 <MapPin size={16} className="mr-1" />
-                <span>{user.location}</span>
+                <span>{currentProfile.location}</span>
               </div>
             )}
-            {user.website && (
+            {currentProfile.website && (
               <div className="flex items-center mr-4">
                 <LinkIcon size={16} className="mr-1" />
-                <a href={user.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  {user.website.replace(/^https?:\/\//, '')}
+                <a href={currentProfile.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  {currentProfile.website.replace(/^https?:\/\//, '')}
                 </a>
               </div>
             )}
-            {user.joinDate && (
+            {currentProfile.join_date && (
               <div className="flex items-center mr-4">
                 <Calendar size={16} className="mr-1" />
-                <span>Joined {user.joinDate}</span>
+                <span>Joined {currentProfile.join_date}</span>
               </div>
             )}
           </div>
 
           <div className="flex mt-3 text-sm">
-            <Link href={`/profile/${user.username}/following`} className="mr-4 hover:underline">
-              <span className="font-bold">{user.stats.following}</span> Following
+            <Link href={`/profile/${currentProfile.username}/following`} className="mr-4 hover:underline">
+              <span className="font-bold">{currentProfile.following_count || 0}</span> Following
             </Link>
-            <Link href={`/profile/${user.username}/followers`} className="hover:underline">
-              <span className="font-bold">{user.stats.followers}</span> Followers
+            <Link href={`/profile/${currentProfile.username}/followers`} className="hover:underline">
+              <span className="font-bold">{currentProfile.followers_count || 0}</span> Followers
             </Link>
           </div>
         </div>
@@ -140,64 +203,61 @@ export default function UserProfile({ user }: UserProfileProps) {
       {/* Tabs & Content */}
       <Tabs defaultValue="posts" onValueChange={setActiveTab}>
         <TabsList className="w-full grid grid-cols-4 bg-transparent border-b border-gray-200 dark:border-gray-800">
-          <TabsTrigger
-            value="posts"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none py-3"
-          >
-            Posts
-          </TabsTrigger>
-          <TabsTrigger
-            value="replies"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none py-3"
-          >
-            Replies
-          </TabsTrigger>
-          <TabsTrigger
-            value="highlights"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none py-3"
-          >
-            Highlights
-          </TabsTrigger>
-          <TabsTrigger
-            value="media"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:shadow-none py-3"
-          >
-            Media
-          </TabsTrigger>
+          <TabsTrigger value="posts">Posts</TabsTrigger>
+          <TabsTrigger value="replies">Replies</TabsTrigger>
+          <TabsTrigger value="highlights">Highlights</TabsTrigger>
+          <TabsTrigger value="media">Media</TabsTrigger>
         </TabsList>
-        <TabsContent value="posts" className="divide-y divide-gray-200 dark:divide-gray-800">
-          {posts.map(post => (
-            <PostItem 
-              key={post.id} 
-              post={post} 
-              onRepost={() => handleRepost(post.id)}
-              onBookmark={() => handleBookmark(post.id)}
-            />
-          ))}
+
+        <TabsContent value="posts">
+          {postsLoading ? (
+            <div className="py-10 text-center">
+              <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+              <p className="text-gray-500">Chargement des posts...</p>
+            </div>
+          ) : posts.length > 0 ? (
+            posts.map(post => (
+              <PostItem
+                key={post.id}
+                post={post}
+                onRepost={() => handleRepost(post.id)}
+                onBookmark={() => handleBookmark(post.id)}
+              />
+            ))
+          ) : (
+            <div className="py-10 text-center text-gray-500">
+              <p>Aucun post pour le moment</p>
+            </div>
+          )}
         </TabsContent>
+
         <TabsContent value="replies">
           <div className="py-10 text-center text-gray-500">
-            <p>No replies yet</p>
+            <p>Aucune réponse pour le moment</p>
           </div>
         </TabsContent>
+
         <TabsContent value="highlights">
           <div className="py-10 text-center text-gray-500">
-            <p>No highlights yet</p>
+            <p>Aucun highlight pour le moment</p>
           </div>
         </TabsContent>
+
         <TabsContent value="media">
           <div className="p-4">
-            <div className="grid grid-cols-3 gap-1">
-              {posts.filter(post => post.media && post.media.length > 0).map(post => (
-                <div key={post.id} className="aspect-square overflow-hidden">
-                  <img 
-                    src={post.media![0]} 
-                    alt="Media" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
+            {posts.filter(p => p.media_url).length > 0 ? (
+              <div className="grid grid-cols-3 gap-1">
+                {posts.filter(p => p.media_url).map(post => (
+                  <div key={post.id} className="aspect-square overflow-hidden">
+                    <img src={post.media_url} alt="Media" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-10 text-center text-gray-500">
+                <p>Aucun média pour le moment</p>
+              </div>
+            )}
           </div>
         </TabsContent>
       </Tabs>
