@@ -16,6 +16,24 @@ export interface User {
   };
 }
 
+// Interface pour les profils Supabase
+export interface Profile {
+  id: string;
+  username: string;
+  full_name: string;
+  avatar_url?: string;
+  cover_photo?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  join_date?: string;
+  is_verified?: boolean;
+  following_count?: number;
+  followers_count?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface PostStats {
   comments: number;
   reposts: number;

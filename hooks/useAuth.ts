@@ -7,48 +7,136 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Récupérer la session actuelle avec le profil
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const userWithProfile = await getUserWithProfile(session.user)
-        setUser(userWithProfile)
-      } else {
+    let isMounted = true
+
+    const initializeAuth = async () => {
+      try {
+        // Récupérer la session actuelle avec le profil
+        const { data: { session }, error } = await supabase.auth.getSession()
+
+        if (error) {
+          console.error('Erreur lors de la récupération de la session:', error)
+          if (isMounted) {
+            setUser(null)
+            setLoading(false)
+          }
+          return
+        }
+
+        if (session?.user && isMounted) {
+          try {
+            const userWithProfile = await getUserWithProfile(session.user)
+            setUser(userWithProfile)
+          } catch (profileError) {
+            console.error('Erreur lors de la récupération du profil:', profileError)
+            // En cas d'erreur de profil, on utilise l'utilisateur de base
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              username: session.user.user_metadata?.username,
+              user_metadata: {
+                full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Utilisateur',
+                username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'user'
+              }
+            })
+          }
+        } else if (isMounted) {
+          setUser(null)
+        }
+      } catch (error) {
+        console.error('Erreur inattendue dans initializeAuth:', error)
+        if (isMounted) {
+          setUser(null)
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    initializeAuth()
+
+    // Écouter les changements d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) return
+
+      try {
+        if (session?.user) {
+          try {
+            const userWithProfile = await getUserWithProfile(session.user)
+            setUser(userWithProfile)
+          } catch (profileError) {
+            console.error('Erreur lors de la récupération du profil:', profileError)
+            // En cas d'erreur de profil, on utilise l'utilisateur de base
+            setUser({
+              id: session.user.id,
+              email: session.user.email!,
+              username: session.user.user_metadata?.username,
+              user_metadata: {
+                full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Utilisateur',
+                username: session.user.user_metadata?.username || session.user.email?.split('@')[0] || 'user'
+              }
+            })
+          }
+        } else {
+          setUser(null)
+        }
+      } catch (error) {
+        console.error('Erreur lors du changement d\'état d\'authentification:', error)
         setUser(null)
       }
-      setLoading(false)
     })
 
-    // Repere les changements d'authentification
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session?.user) {
-        const userWithProfile = await getUserWithProfile(session.user)
-        setUser(userWithProfile)
-      } else {
-        setUser(null)
-      }
-      setLoading(false)
-    })
-
-    return () => subscription.unsubscribe()
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
   }, [])
 
   const getUserWithProfile = async (user: User): Promise<AuthUser> => {
-    // Récupérer le profil depuis la base de données
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('username, full_name')
-      .eq('id', user.id)
-      .single()
+    try {
+      // Récupérer le profil depuis la base de données
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('username, full_name')
+        .eq('id', user.id)
+        .single()
 
-    return {
-      id: user.id,
-      email: user.email!,
-      username: profile?.username,
-      user_metadata: {
-        full_name: profile?.full_name || user.user_metadata.full_name,
-        username: profile?.username || user.user_metadata.username
+      if (error) {
+        console.warn('Erreur lors de la récupération du profil:', error)
+        // Si pas de profil, on utilise les métadonnées de l'utilisateur
+        return {
+          id: user.id,
+          email: user.email!,
+          username: user.user_metadata?.username,
+          user_metadata: {
+            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Utilisateur',
+            username: user.user_metadata?.username || user.email?.split('@')[0] || 'user'
+          }
+        }
+      }
+
+      return {
+        id: user.id,
+        email: user.email!,
+        username: profile?.username,
+        user_metadata: {
+          full_name: profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Utilisateur',
+          username: profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'user'
+        }
+      }
+    } catch (error) {
+      console.error('Erreur inattendue dans getUserWithProfile:', error)
+      // En cas d'erreur, on retourne un utilisateur avec les métadonnées de base
+      return {
+        id: user.id,
+        email: user.email!,
+        username: user.user_metadata?.username || user.email?.split('@')[0] || 'user',
+        user_metadata: {
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Utilisateur',
+          username: user.user_metadata?.username || user.email?.split('@')[0] || 'user'
+        }
       }
     }
   }
