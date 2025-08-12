@@ -41,10 +41,10 @@ export class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-              Une erreur s'est produite
+              Une erreur s&apos;est produite
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Désolé, quelque chose s'est mal passé. Veuillez réessayer.
+              Désolé, quelque chose s&apos;est mal passé. Veuillez réessayer.
             </p>
             <div className="space-y-3">
               <Button
@@ -64,7 +64,7 @@ export class ErrorBoundary extends Component<Props, State> {
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mt-4 text-left">
                 <summary className="cursor-pointer text-sm text-gray-500 dark:text-gray-400">
-                  Détails de l'erreur (développement)
+                  Détails de l&apos;erreur (développement)
                 </summary>
                 <pre className="mt-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-2 rounded overflow-auto">
                   {this.state.error.stack}

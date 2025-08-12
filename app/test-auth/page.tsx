@@ -67,7 +67,7 @@ export default function TestAuthPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">Test de l'Authentification</h1>
+        <h1 className="text-3xl font-bold">Test de l&apos;Authentification</h1>
 
         {error && (
           <Card className="border-red-200 bg-red-50">
@@ -88,7 +88,7 @@ export default function TestAuthPage() {
           <Card>
             <CardHeader>
               <CardTitle>Hook useAuth</CardTitle>
-              <CardDescription>État de l'authentification via le hook</CardDescription>
+              <CardDescription>État de l&apos;authentification via le hook</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
@@ -150,7 +150,7 @@ export default function TestAuthPage() {
           <CardContent className="space-y-3">
             <div className="flex flex-wrap gap-2">
               <Button onClick={checkDirectAuth} variant="outline">
-                Actualiser l'état
+                Actualiser l&apos;état
               </Button>
               <Button onClick={signInTest} variant="outline">
                 Test de connexion
@@ -184,7 +184,7 @@ export default function TestAuthPage() {
         <Card>
           <CardHeader>
             <CardTitle>Configuration</CardTitle>
-            <CardDescription>Variables d'environnement et configuration</CardDescription>
+            <CardDescription>Variables d&apos;environnement et configuration</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm">

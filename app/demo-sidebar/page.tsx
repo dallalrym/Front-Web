@@ -18,7 +18,7 @@ export default function DemoSidebarPage() {
               <ul className="space-y-3 text-gray-600 dark:text-gray-300">
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>Affichage du profil utilisateur :</strong> Nom complet et email de l'utilisateur connecté</span>
+                  <span><strong>Affichage du profil utilisateur :</strong> Nom complet et email de l&apos;utilisateur connecté</span>
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
@@ -30,7 +30,7 @@ export default function DemoSidebarPage() {
                 </li>
                 <li className="flex items-start">
                   <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                  <span><strong>États non connectés :</strong> Affichage approprié quand l'utilisateur n'est pas connecté</span>
+                  <span><strong>États non connectés :</strong> Affichage approprié quand l&apos;utilisateur n&apos;est pas connecté</span>
                 </li>
               </ul>
             </div>
@@ -41,22 +41,22 @@ export default function DemoSidebarPage() {
               </h2>
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-2">1. Test des états d'authentification</h3>
+                  <h3 className="font-medium text-gray-900 dark:text-white mb-2">1. Test des états d&apos;authentification</h3>
                   <p className="text-gray-600 dark:text-gray-300">
                     Utilisez les boutons de démonstration dans la sidebar pour tester les différents états :
                   </p>
                   <ul className="mt-2 ml-4 space-y-1 text-sm text-gray-500 dark:text-gray-400">
                     <li>• <strong>Chargement :</strong> Simule le chargement des données utilisateur</li>
                     <li>• <strong>Connecté :</strong> Affiche un utilisateur connecté avec nom et email</li>
-                    <li>• <strong>Non connecté :</strong> Affiche l'état de déconnexion</li>
+                    <li>• <strong>Non connecté :</strong> Affiche l&apos;état de déconnexion</li>
                   </ul>
                 </div>
 
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white mb-2">2. Test de la responsivité</h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    Redimensionnez votre navigateur pour tester l'affichage sur différentes tailles d'écran.
-                    La sidebar s'adapte automatiquement (mode compact sur mobile, mode étendu sur desktop).
+                    Redimensionnez votre navigateur pour tester l&apos;affichage sur différentes tailles d&apos;écran.
+                    La sidebar s&apos;adapte automatiquement (mode compact sur mobile, mode étendu sur desktop).
                   </p>
                 </div>
 
@@ -76,13 +76,13 @@ export default function DemoSidebarPage() {
               </h2>
               <p className="text-blue-800 dark:text-blue-200 mb-4">
                 Cette démonstration montre comment la sidebar fonctionnera une fois intégrée avec Supabase.
-                Pour l'utiliser en production :
+                Pour l&apos;utiliser en production :
               </p>
               <ol className="list-decimal list-inside space-y-2 text-blue-700 dark:text-blue-300">
-                <li>Configurez vos variables d'environnement Supabase</li>
+                <li>Configurez vos variables d&apos;environnement Supabase</li>
                 <li>Créez la table <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">profiles</code> avec le script SQL fourni</li>
                 <li>Remplacez <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">SidebarDemo</code> par <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">LeftSidebar</code> dans votre layout</li>
-                <li>Testez l'authentification réelle avec vos utilisateurs</li>
+                <li>Testez l&apos;authentification réelle avec vos utilisateurs</li>
               </ol>
             </div>
           </div>

@@ -69,7 +69,7 @@ export default function DebugAuthPage() {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold mb-4">Débogage de l'Authentification</h1>
+          <h1 className="text-2xl font-bold mb-4">Débogage de l&apos;Authentification</h1>
           <p>Chargement...</p>
         </div>
       </div>
@@ -80,7 +80,7 @@ export default function DebugAuthPage() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Débogage de l'Authentification</h1>
+          <h1 className="text-2xl font-bold">Débogage de l&apos;Authentification</h1>
           <div className="space-x-2">
             <Button onClick={checkAuthStatus} variant="outline">
               Actualiser
@@ -105,7 +105,7 @@ export default function DebugAuthPage() {
         <Card>
           <CardHeader>
             <CardTitle>Informations de Session</CardTitle>
-            <CardDescription>État de l'authentification Supabase</CardDescription>
+            <CardDescription>État de l&apos;authentification Supabase</CardDescription>
           </CardHeader>
           <CardContent>
             <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
@@ -152,7 +152,7 @@ export default function DebugAuthPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Variables d'Environnement</CardTitle>
+            <CardTitle>Variables d&apos;Environnement</CardTitle>
             <CardDescription>Configuration Supabase</CardDescription>
           </CardHeader>
           <CardContent>

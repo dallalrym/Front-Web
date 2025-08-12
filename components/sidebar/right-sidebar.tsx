@@ -34,7 +34,7 @@ export default function RightSidebar() {
       </div>
 
       <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4">
-        <h2 className="font-bold text-xl mb-4">À l'affiche</h2>
+        <h2 className="font-bold text-xl mb-4">À l&apos;affiche</h2>
         <div className="space-y-4">
           {trends.map((trend, index) => (
             <div key={index} className="cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 p-2 rounded-lg">

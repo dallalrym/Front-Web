@@ -89,7 +89,7 @@ export default function ProfileTest() {
         <CardContent className="space-y-4">
           <div className="flex space-x-2">
             <div className="flex-1">
-              <Label htmlFor="username">Nom d'utilisateur</Label>
+              <Label htmlFor="username">Nom d&apos;utilisateur</Label>
               <Input
                 id="username"
                 value={username}
@@ -131,7 +131,7 @@ export default function ProfileTest() {
                 <div className="space-y-2 text-sm">
                   <div><strong>ID:</strong> {profile.id}</div>
                   <div><strong>Nom complet:</strong> {profile.full_name}</div>
-                  <div><strong>Nom d'utilisateur:</strong> @{profile.username}</div>
+                  <div><strong>Nom d&apos;utilisateur:</strong> @{profile.username}</div>
                   <div><strong>Bio:</strong> {profile.bio || 'Aucune bio'}</div>
                   <div><strong>Localisation:</strong> {profile.location || 'Non spécifiée'}</div>
                   <div><strong>Vérifié:</strong> {profile.is_verified ? 'Oui' : 'Non'}</div>

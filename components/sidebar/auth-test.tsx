@@ -11,7 +11,7 @@ export default function AuthTest() {
     <Card className="mb-4">
       <CardHeader>
         <CardTitle className="text-sm">Test Auth Sidebar</CardTitle>
-        <CardDescription>État de l'authentification dans la sidebar</CardDescription>
+        <CardDescription>État de l&apos;authentification dans la sidebar</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         <div className="text-xs space-y-1">
