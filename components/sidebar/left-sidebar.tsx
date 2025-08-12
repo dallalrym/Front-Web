@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from "next/image";
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Home, Search, Bell, Bookmark, ListOrdered,
   User, PenSquare, LogOut
@@ -15,8 +15,20 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function LeftSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [showComposeDialog, setShowComposeDialog] = useState(false);
   const { user, loading, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await signOut();
+      if (!error) {
+        router.push('/login');
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const navItems = [
     { name: 'Home', href: '/', icon: Home },
@@ -25,25 +37,20 @@ export default function LeftSidebar() {
     { name: 'Profile', href: '/profile', icon: User },
   ];
 
-  const handleLogout = async () => {
-    await signOut();
-    window.location.href = '/login';
-  };
-
   return (
     <div className="w-20 xl:w-64 h-screen sticky top-0 flex flex-col p-4">
       <div className="p-2 mb-4">
         <Link href="/">
-      <div className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden">
-        <Image
-          src="/Image/logo.png"
-          alt="Logo"
-          width={70}
-          height={70}
-          className="object-cover"
-        />
-      </div>
-    </Link>
+          <div className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden">
+            <Image
+              src="/Image/logo.png"
+              alt="Logo"
+              width={70}
+              height={70}
+              className="object-cover"
+            />
+          </div>
+        </Link>
       </div>
 
       <nav className="space-y-2 mb-8">

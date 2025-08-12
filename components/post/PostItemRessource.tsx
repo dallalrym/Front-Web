@@ -45,7 +45,7 @@ export default function PostItemRessource({ title, description, content, created
             </button>
             <button className="flex items-center hover:text-primary transition">
               <Share className="w-4 h-4 mr-1" />
-              <span>Parrtager</span>
+              <span>Partager</span>
             </button>
           </div>
         </div>
