@@ -53,6 +53,15 @@ export default function LeftSidebar() {
         </Link>
       </div>
 
+      {/* Utilisateur non connecté */}
+      {!loading && !user && (
+          <div className="p-3 text-center mb-8">
+            <Link href="/login">
+              <Button variant="outline" size="sm" className="w-full">CONNEXION</Button>
+            </Link>
+          </div>
+        )}
+
       <nav className="space-y-2 mb-8">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -138,14 +147,6 @@ export default function LeftSidebar() {
         )}
 
         {/* Utilisateur non connecté */}
-        {!loading && !user && (
-          <div className="p-3 text-center">
-            <p className="text-gray-500 text-sm mb-2">Non connecté</p>
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="w-full">Se connecter</Button>
-            </Link>
-          </div>
-        )}
       </div>
     </div>
   );
