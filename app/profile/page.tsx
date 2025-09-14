@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layouts/main-layout';
 import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Trash2, Settings } from 'lucide-react';
+import DeleteAccountDialog from '@/components/profile/delete-account-dialog';
 
 type Profile = {
   id: number;
@@ -127,19 +130,36 @@ export default function ProfilePage() {
       <div className="flex-1 p-8">
         <div className="max-w-3xl mx-auto">
           {/* Header Profil */}
-          <div className="flex items-center mb-6">
-            <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 mr-4 flex items-center justify-center">
-              {profile.avatar_url ? (
-                <Image src={profile.avatar_url} alt={profile.full_name || 'Avatar'} width={64} height={64} className="object-cover" />
-              ) : (
-                <span className="text-xl font-bold text-gray-600">
-                  {(profile.full_name || profile.email || 'U').charAt(0).toUpperCase()}
-                </span>
-              )}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-200 mr-4 flex items-center justify-center">
+                {profile.avatar_url ? (
+                  <Image src={profile.avatar_url} alt={profile.full_name || 'Avatar'} width={64} height={64} className="object-cover" />
+                ) : (
+                  <span className="text-xl font-bold text-gray-600">
+                    {(profile.full_name || profile.email || 'U').charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">{profile.full_name || 'Utilisateur'}</h1>
+                <p className="text-gray-600">{profile.email}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold">{profile.full_name || 'Utilisateur'}</h1>
-              <p className="text-gray-600">{profile.email}</p>
+            
+            {/* Boutons d'action */}
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                Paramètres
+              </Button>
+              
+              <DeleteAccountDialog>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Supprimer le compte
+                </Button>
+              </DeleteAccountDialog>
             </div>
           </div>
 
