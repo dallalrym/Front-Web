@@ -1,11 +1,7 @@
-# Ceci est le Front Web du Espace Resources et Solidarité (ESS)
+# COMPTE TESTE email: tiagocoronel25@gmail.com mdp: tiagocoronel25@gmail.com
 
-## Liens Utiles
-
-* **Site Web du Projet :** [Lien vers le site web du projet]
 
 ## Dépôts du Projet
-
 Ce projet est composé de plusieurs dépôts, chacun dédié à une partie spécifique de l'application :
 
 1.  **Documentation :** Documentation technique et utilisateur du projet.
